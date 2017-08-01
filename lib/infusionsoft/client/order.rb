@@ -3,7 +3,7 @@ module Infusionsoft
     # The Order service allows you to create an order.
     module Order
       
-      def place_order
+      def order_place_order
       end
       
     end
