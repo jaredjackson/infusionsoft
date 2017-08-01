@@ -28,6 +28,6 @@ module Infusionsoft
     include Infusionsoft::Client::Search
     include Infusionsoft::Client::CreditCard
     include Infusionsoft::Client::Funnel
-    include Infusionsoft::Client::Funnel
+    include Infusionsoft::Client::Order
   end
 end
