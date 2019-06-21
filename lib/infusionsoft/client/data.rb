@@ -141,6 +141,15 @@ module Infusionsoft
       def data_update_custom_field(field_id, field_values)
         response = xmlrpc('DataService.updateCustomField', field_id, field_values)
       end
+      
+      # Performs a query across the given table based on the query data and returns the count of records.
+      #
+      # @param [String] table the name of the Infusiosoft database table
+      # @param [Hash] data  the data you would like to query on. { :FirstName => 'Bob' }
+      # @return [Integer] returns the count of the record added
+      def data_count(table, data)
+        response = xmlrpc('DataService.count', field_id, field_values)
+      end
     end
   end
 end
