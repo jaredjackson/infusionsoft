@@ -148,7 +148,7 @@ module Infusionsoft
       # @param [Hash] data  the data you would like to query on. { :FirstName => 'Bob' }
       # @return [Integer] returns the count of the record added
       def data_count(table, data)
-        response = xmlrpc('DataService.count', field_id, field_values)
+        response = xmlrpc('DataService.count', table, data)
       end
     end
   end
