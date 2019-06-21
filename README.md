@@ -6,6 +6,9 @@
 A Ruby wrapper for the Infusionsoft API
 
 **update notes**
+* upcoming - Adding support for rest api
+* v1.2.2 - Catching Infusionsoft API SSL handshake issues
+* v1.2.1 - Added OAuth support
 * v1.2.0 - Added `invoice_add_subscription` call to mirror Infusionsoft API parameters to eventually replace `invoice_add_recurring_order`
 * maybe?? - Going to add Infusionsoft API authentication Oauth flow. Also, I'm thinking of rewriting parts of it to make the calls more user friendly and adding some convenience methods. If you have any suggestions, let me know.
 * 07/21/2015 - Implementation of tests and build/coverage (Thanks! @TheMetalCode)
@@ -21,41 +24,56 @@ A Ruby wrapper for the Infusionsoft API
 
 ## <a name="setup">Setup & Configuration</a>
 1. **Rails 2.3** - add `config.gem 'infusionsoft'` **Rails >= 3** - add `'infusionsoft'` to your `Gemfile`
-2. Enable the API on your Infusionsoft account (if you haven't already) and generate your API Key: [See Infusionsoft Doc](http://ug.infusionsoft.com/article/AA-00442/0/How-do-I-enable-the-Infusionsoft-API-and-generate-an-API-Key.html)
+2. Enable the API on your Infusionsoft account (if you haven't already) and generate your API Key: [See Infusionsoft Doc](https://classic-infusionsoft.knowledgeowl.com/help/api-key)
 3. Then create an initializer in `config\initializers` called infusionsoft.rb and the following
 
-<b></b>
+```ruby
+# Added to your config\initializers file
+Infusionsoft.configure do |config|
+  config.api_url = 'YOUR_INFUSIONSOFT_URL' # example infused.infusionsoft.com DO NOT INCLUDE https://
+  config.api_key = 'YOUR_INFUSIONSOFT_API_KEY'
+  config.api_logger = Logger.new("#{Rails.root}/log/infusionsoft_api.log") # optional logger file
+end
+```
+## OAUTH 2.0
 
-    # Added to your config\initializers file
-    Infusionsoft.configure do |config|
-      config.api_url = 'YOUR_INFUSIONSOFT_URL' # example infused.infusionsoft.com DO NOT INCLUDE https://
-      config.api_key = 'YOUR_INFUSIONSOFT_API_KEY'
-      config.api_logger = Logger.new("#{Rails.root}/log/infusionsoft_api.log") # optional logger file
-    end
+You will need to handle and obtain the access_token on your own. 
+
+```ruby
+# You will need to attain the access_token first, then do the config like so:
+Infusionsoft.configure do |config|
+  config.use_oauth = true
+  config.api_url = 'api.infusionsoft.com' # do not include https://
+  config.api_key = 'ACCESS_TOKEN' # access_token
+  config.api_logger = Logger.new("#{Rails.root}/log/infusionsoft_api.log") # optional logger file
+end
+```
 
 ## <a name="examples">Usage Examples</a>
 
-    # Get a users first and last name using the DataService
-    Infusionsoft.data_load('Contact', contact_id, [:FirstName, :LastName])
+```ruby
+# Get a users first and last name using the DataService
+Infusionsoft.data_load('Contact', contact_id, [:FirstName, :LastName])
 
-    # Get a list of custom fields
-    Infusionsoft.data_find_by_field('DataFormField', 100, 0, 'FormId', -1, ['Name'])
-    # Note, when updating custom fields they are case sensisitve and need to be prefaced with a '_'
+# Get a list of custom fields
+Infusionsoft.data_find_by_field('DataFormField', 100, 0, 'FormId', -1, ['Name'])
+# Note, when updating custom fields they are case sensisitve and need to be prefaced with a '_'
 
-    # Update a contact with specific field values
-    Infusionsoft.contact_update(contact_id, { :FirstName => 'first_name', :Email => 'test@test.com' })
+# Update a contact with specific field values
+Infusionsoft.contact_update(contact_id, { :FirstName => 'first_name', :Email => 'test@test.com' })
 
-    # Add a new Contact
-    Infusionsoft.contact_add({:FirstName => 'first_name', :LastName => 'last_name', :Email => 'test@test.com'})
+# Add a new Contact
+Infusionsoft.contact_add({:FirstName => 'first_name', :LastName => 'last_name', :Email => 'test@test.com'})
 
-    # Create a blank Invoice
-    invoice_id = Infusionsoft.invoice_create_blank_order(contact_id, description, Date.today, lead_affiliate_id, sale_affiliate_id)
+# Create a blank Invoice
+invoice_id = Infusionsoft.invoice_create_blank_order(contact_id, description, Date.today, lead_affiliate_id, sale_affiliate_id)
 
-    # Then add item to invoice
-    Infusionsoft.invoice_add_order_item(invoice_id, product_id, product_type, amount, quantity, description_here, notes)
+# Then add item to invoice
+Infusionsoft.invoice_add_order_item(invoice_id, product_id, product_type, amount, quantity, description_here, notes)
 
-    # Then charge the invoice
-    Infusionsoft.invoice_charge_invoice(invoice_id, notes, credit_card_id, merchange_id, bypass_commissions)
+# Then charge the invoice
+Infusionsoft.invoice_charge_invoice(invoice_id, notes, credit_card_id, merchange_id, bypass_commissions)
+```
 
 
 ## <a name="contributing">Contributing</a>
@@ -80,7 +98,7 @@ features.
 ## <a name="rubies">Supported Rubies</a>
 This library aims to support the following Ruby implementations:
 
-* Ruby >= 2.0
+* Ruby >= 2.3.8
 * [JRuby](http://www.jruby.org/)
 * [Rubinius](http://rubini.us/)
 * [Ruby Enterprise Edition](http://www.rubyenterpriseedition.com/)
@@ -104,7 +122,7 @@ time of a major release, support for that Ruby version may be dropped.
 * Need to add a history log for additional contributers
 
 ## <a name="copyright">Copyright</a>
-Copyright (c) 2017 Nathan Leavitt
+Copyright (c) 2019 Nathan Leavitt
 
-See [LICENSE](https://github.com/nateleavitt/infusionsoft/blob/master/LICENSE.md) for details.
+See [MIT LICENSE](https://github.com/nateleavitt/infusionsoft/blob/master/LICENSE.md) for details.
 
